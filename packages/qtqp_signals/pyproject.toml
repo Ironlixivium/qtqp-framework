@@ -1,6 +1,6 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "q_signalkit"
@@ -12,7 +12,15 @@ dependencies = []
 qt  = ["PySide6-Essentials"]
 dev = ["PySide6-Essentials", "pytest", "pyright", "ruff"]
 
+[tool.setuptools]
+packages = ["qtqp.signals"]
+
+[tool.setuptools.package-dir]
+"qtqp.signals" = "src"
+
 [tool.pyright]
+include = ["src"]
+pythonPath = "../../.venv/bin/python"
 pythonVersion = "3.14"
 typeCheckingMode = "strict"
 

@@ -10,9 +10,15 @@ dependencies = [
     "PySide6>=6.7",
 ]
 
+[tool.setuptools]
+packages = ["qtqp.path"]
+
+[tool.setuptools.package-dir]
+"qtqp.path" = "src"
+
 [tool.pytest.ini_options]
 pythonpath = ["."]
-testpaths = ["qtqp_path"]
+testpaths = ["src"]
 
 [tool.black]
 line-length = 120
@@ -25,8 +31,8 @@ lint.select = ["E","F","I","UP","B","C90"]
 lint.ignore = []
 
 [tool.pyright]
-include = ["qtqp_path"]
-pythonPath = ".venv/bin/python"
+include = ["src"]
+pythonPath = "../../.venv/bin/python"
 pythonPlatform = "Linux"
 reportMissingImports = true
 reportMissingModuleSource = true

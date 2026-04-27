@@ -9,12 +9,18 @@ requires-python = ">=3.14"
 dependencies = [
     "PySide6>=6.7",
     "platformdirs>=4.0",
-    "qtqp_path @ file:///home/qplite/Projects/qtqp_path",
+    "qtqp_path",
 ]
+
+[tool.setuptools]
+packages = ["qtqp.resource_handler"]
+
+[tool.setuptools.package-dir]
+"qtqp.resource_handler" = "src"
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
-testpaths = ["tests", "q_resources"]
+testpaths = ["src"]
 
 [tool.black]
 line-length = 120
@@ -27,9 +33,8 @@ lint.select = ["E","F","I","UP","B","C90"]
 lint.ignore = []
 
 [tool.pyright]
-include = ["q_resources"]
-pythonPath = ".venv/bin/python"
-extraPaths = ["/home/qplite/Projects/qtqp_path"]
+include = ["src"]
+pythonPath = "../../.venv/bin/python"
 pythonPlatform = "Linux"
 reportMissingImports = true
 reportMissingModuleSource = true

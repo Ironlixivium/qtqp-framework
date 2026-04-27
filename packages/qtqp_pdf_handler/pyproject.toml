@@ -7,9 +7,15 @@ name = "pdf_viewer_editor_qt"
 version = "0.1.0"
 requires-python = ">=3.14"
 
+[tool.setuptools]
+packages = ["qtqp.pdf_handler"]
+
+[tool.setuptools.package-dir]
+"qtqp.pdf_handler" = "src"
+
 [tool.pytest.ini_options]
 pythonpath = ["."]
-testpaths = ["tests", "pdf_viewer_editor_qt"]
+testpaths = ["src"]
 
 [tool.black]
 line-length = 120
@@ -21,12 +27,9 @@ target-version = "py314"
 lint.select = ["E","F","I","UP","B","C90"]
 lint.ignore = []
 
-[tool.pylance]
-include = ["pdf_viewer_editor_qt"]
-executionEnvironments = [
-    { root = "pdf_viewer_editor_qt" }
-]
-pythonpath = "~/Projects/pdf_viewer_editor_qt/.venv/bin/python"
+[tool.pyright]
+include = ["src"]
+pythonPath = "../../.venv/bin/python"
 pythonPlatform = "Linux"
 reportMissingImports = true
 reportMissingModuleSource = true

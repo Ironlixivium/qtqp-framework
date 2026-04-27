@@ -10,9 +10,15 @@ dependencies = [
     "PySide6>=6.7",
 ]
 
+[tool.setuptools]
+packages = ["qtqp.core"]
+
+[tool.setuptools.package-dir]
+"qtqp.core" = "src"
+
 [tool.pytest.ini_options]
 pythonpath = ["."]
-testpaths = ["tests", "qtqp_core"]
+testpaths = ["tests", "src"]
 faulthandler_timeout = 10
 
 [tool.black]
@@ -26,8 +32,8 @@ lint.select = ["E","F","I","UP","B","C90"]
 lint.ignore = []
 
 [tool.pyright]
-include = ["qtqp_core"]
-pythonPath = ".venv/bin/python"
+include = ["src"]
+pythonPath = "../../.venv/bin/python"
 pythonPlatform = "Linux"
 reportMissingImports = true
 reportMissingModuleSource = true
