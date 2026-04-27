@@ -1,0 +1,11 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"path": "../../qtqp_resource_handler/.vscode"
+		}
+	],
+	"settings": {}
+}

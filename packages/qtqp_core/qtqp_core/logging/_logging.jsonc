@@ -1,0 +1,308 @@
+{
+  // File: logging.jsonc
+  // Purpose:
+  // - Edit this as your human-friendly logging template.
+  // - Strip comments before loading it as a standard dictConfig payload.
+  // - Python's logging.config.dictConfig expects a normal dict, not raw JSON text.
+
+  "version": 1,
+  // Required by dictConfig.
+  // Currently, 1 is the standard value.
+
+  "disable_existing_loggers": false,
+  // true  -> disable loggers that already exist unless they are named here
+  // false -> leave existing third-party loggers alone
+
+  // "incremental": false,
+  // Optional.
+  // true  -> update an existing config instead of replacing it
+  // false -> normal full configuration
+
+  // "filters": {
+  //   "redact_secrets": {
+  //     "()": "your_package.logging_filters.RedactSecretsFilter"
+  //     // Use "()" for a callable/class import path.
+  //     // This filter can scrub:
+  //     // - Authorization headers
+  //     // - API keys
+  //     // - tokens
+  //     // - passwords
+  //     // - cookies
+  //   },
+
+  //   "only_debug_true": {
+  //     "()": "your_package.logging_filters.DebugFlagFilter",
+  //     "flag_name": "debug_mode"
+  //     // Example custom filter args.
+  //     // Add any constructor kwargs your filter class expects.
+  //   }
+  // },
+
+  "formatters": {
+    "plain": {
+      "format": "%(asctime)s | %(levelname)s | %(name)s | %(message)s",
+      // Common fields:
+      // %(asctime)s
+      // %(created)f
+      // %(levelname)s
+      // %(levelno)s
+      // %(name)s
+      // %(module)s
+      // %(filename)s
+      // %(lineno)d
+      // %(funcName)s
+      // %(process)d
+      // %(processName)s
+      // %(thread)d
+      // %(threadName)s
+      // %(message)s
+
+      "datefmt": "%Y-%m-%dT%H:%M:%S%z"
+      // Example:
+      // "%Y-%m-%d %H:%M:%S"
+      // "%Y-%m-%dT%H:%M:%S%z"
+      // null / omit -> logging default
+    },
+
+    "verbose": {
+      "format": "%(asctime)s | %(levelname)s | %(name)s | %(module)s:%(lineno)d | %(funcName)s | pid=%(process)d tid=%(thread)d | %(message)s",
+      "datefmt": "%Y-%m-%dT%H:%M:%S%z"
+    },
+
+    "audit": {
+      "format": "%(asctime)s | %(levelname)s | %(name)s | event=%(message)s",
+      "datefmt": "%Y-%m-%dT%H:%M:%S%z"
+      // Audit logs are usually kept flatter and more deliberate.
+    },
+
+    "json": {
+      "()": "pythonjsonlogger.jsonlogger.JsonFormatter",
+      "format": "%(asctime)s %(levelname)s %(name)s %(message)s %(module)s %(lineno)d %(funcName)s %(process)d %(thread)d"
+      // Replace with your preferred JSON formatter class if needed.
+      // Other common choices include custom formatter classes you write yourself.
+    }
+  },
+
+  "handlers": {
+    "stderr_warning": {
+      "class": "logging.StreamHandler",
+      // Common handler classes:
+      // logging.StreamHandler
+      // logging.FileHandler
+      // logging.handlers.RotatingFileHandler
+      // logging.handlers.TimedRotatingFileHandler
+      // logging.handlers.QueueHandler
+      // logging.handlers.SocketHandler
+      // logging.handlers.SMTPHandler
+      // logging.NullHandler
+
+      "level": "WARNING",
+      // Typical choices:
+      // "NOTSET", "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
+
+      "formatter": "plain",
+      "stream": "ext://sys.stderr"
+      // Usually:
+      // "ext://sys.stdout"
+      // "ext://sys.stderr"
+    },
+
+    "stdout_info": {
+      "class": "logging.StreamHandler",
+      "level": "INFO",
+      "formatter": "plain",
+      "stream": "ext://sys.stdout",
+      "filters": ["redact_secrets"]
+    },
+
+    "app_file": {
+      "class": "logging.handlers.TimedRotatingFileHandler",
+      "level": "INFO",
+      "formatter": "verbose",
+      "filename": "logs/app.log",
+      // Absolute or relative path.
+
+      "when": "midnight",
+      // TimedRotatingFileHandler options:
+      // "S"         -> seconds
+      // "M"         -> minutes
+      // "H"         -> hours
+      // "D"         -> days
+      // "midnight"  -> rotate at local midnight
+      // "W0"..."W6" -> weekly on Monday..Sunday
+
+      "interval": 1,
+      // Rotate every N units of "when".
+
+      "backupCount": 90,
+      // Number of old files to keep.
+
+      "encoding": "utf-8",
+      "delay": true,
+      // true  -> open file lazily on first emit
+      // false -> open immediately
+
+      "utc": true,
+      // true  -> base rotation times on UTC
+      // false -> local time
+
+      "filters": ["redact_secrets"]
+    },
+
+    "error_file": {
+      "class": "logging.handlers.RotatingFileHandler",
+      "level": "ERROR",
+      "formatter": "verbose",
+      "filename": "logs/error.log",
+      "maxBytes": 10485760,
+      // Example sizes:
+      // 1048576    -> 1 MiB
+      // 10485760   -> 10 MiB
+      // 52428800   -> 50 MiB
+      // 104857600  -> 100 MiB
+
+      "backupCount": 20,
+      "encoding": "utf-8",
+      "delay": true,
+      "filters": ["redact_secrets"]
+    },
+
+    "audit_file": {
+      "class": "logging.handlers.TimedRotatingFileHandler",
+      "level": "INFO",
+      "formatter": "audit",
+      "filename": "logs/audit.log",
+      "when": "midnight",
+      "interval": 1,
+      "backupCount": 365,
+      "encoding": "utf-8",
+      "delay": true,
+      "utc": true
+      // For long-lived audit trails, you usually want longer retention.
+    },
+
+    "render_debug_file": {
+      "class": "logging.handlers.RotatingFileHandler",
+      "level": "DEBUG",
+      "formatter": "verbose",
+      "filename": "logs/render-debug.log",
+      "maxBytes": 52428800,
+      "backupCount": 10,
+      "encoding": "utf-8",
+      "delay": true
+    },
+
+    "json_file": {
+      "class": "logging.handlers.TimedRotatingFileHandler",
+      "level": "INFO",
+      "formatter": "json",
+      "filename": "logs/structured.jsonl",
+      "when": "midnight",
+      "interval": 1,
+      "backupCount": 30,
+      "encoding": "utf-8",
+      "delay": true,
+      "utc": true,
+      "filters": ["redact_secrets"]
+      // Good for ingestion into log tools later.
+    },
+
+    "queue_handler": {
+      "class": "logging.handlers.QueueHandler",
+      "level": "INFO",
+      "queue": "ext://your_package.logging_runtime.LOG_QUEUE"
+      // Use when you want non-blocking logging via a QueueListener.
+      // The queue object must already exist at import time.
+    }
+
+    /*
+    "email_critical": {
+      "class": "logging.handlers.SMTPHandler",
+      "level": "CRITICAL",
+      "formatter": "verbose",
+      "mailhost": ["smtp.example.com", 587],
+      "fromaddr": "app@example.com",
+      "toaddrs": ["ops@example.com"],
+      "subject": "Critical application error",
+      "credentials": ["username", "password"],
+      "secure": []
+    }
+    */
+  },
+
+  "loggers": {
+    "myapp": {
+      "level": "INFO",
+      "handlers": ["stdout_info", "app_file", "error_file"],
+      "propagate": false
+      // Main application logger:
+      // - human-readable console output
+      // - normal app file
+      // - separate error file
+    },
+
+    "myapp.audit": {
+      "level": "INFO",
+      "handlers": ["audit_file", "json_file"],
+      "propagate": false
+      // Audit logger:
+      // - long retention
+      // - structured copy
+      // - deliberately isolated to avoid duplication
+    },
+
+    "myapp.render": {
+      "level": "WARNING",
+      "handlers": ["render_debug_file"],
+      "propagate": true
+      // Render subsystem:
+      // - keeps its own debug-capable file
+      // - still bubbles WARNING+ upward to myapp
+      // If you want it fully separate, set propagate to false.
+    },
+
+    "myapp.db": {
+      "level": "INFO",
+      "handlers": ["json_file"],
+      "propagate": true
+      // Database logger:
+      // - structured logs only at this node
+      // - still bubbles upward for general app handling
+    },
+
+    "myapp.http": {
+      "level": "DEBUG",
+      "handlers": ["json_file"],
+      "filters": ["redact_secrets"],
+      "propagate": false
+      // HTTP/API boundary logger:
+      // - structured only
+      // - no parent propagation
+      // - good place to apply request/response redaction
+    },
+
+    "myapp.background": {
+      "level": "INFO",
+      "handlers": ["queue_handler"],
+      "propagate": false
+      // Background worker logger:
+      // - offloads writes through a queue
+      // - useful when work threads/processes should not block on disk I/O
+    },
+
+    "urllib3": {
+      "level": "WARNING",
+      "handlers": ["app_file"],
+      "propagate": false
+      // Third-party logger example:
+      // - keep noisy libraries pinned higher unless debugging them
+    }
+  },
+
+  "root": {
+    "level": "WARNING",
+    "handlers": ["stderr_warning"]
+    // Root is the final catch-all.
+    // Keep it conservative unless you want everything bubbling here.
+  }
+}
